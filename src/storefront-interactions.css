@@ -1,0 +1,82 @@
+/*
+ * Shared storefront interaction feedback.
+ * Adjust --storefront-control-* below to tune the motion. Remove this import
+ * from main.jsx to disable this layer completely.
+ */
+#root {
+  --storefront-control-hover-scale: 1.02;
+  --storefront-control-press-scale: 0.97;
+  --storefront-control-easing: cubic-bezier(0.22, 1, 0.36, 1);
+  --storefront-control-duration: 180ms;
+}
+
+/* Search scaling is applied to wrappers, so surrounding layout never reflows. */
+#root .search-input-shell,
+#root .shop-search-wrapper {
+  transform: scale(1);
+  transform-origin: center;
+  transition:
+    transform var(--storefront-control-duration) var(--storefront-control-easing),
+    border-color var(--storefront-control-duration) ease-out,
+    box-shadow var(--storefront-control-duration) ease-out;
+}
+
+#root .search-box:focus-within .search-input-shell,
+#root .shop-search-wrapper:focus-within {
+  transform: scale(var(--storefront-control-hover-scale));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #root .search-box:hover .search-input-shell,
+  #root .shop-search-wrapper:hover {
+    transform: scale(var(--storefront-control-hover-scale));
+  }
+}
+
+/* Individual scale composes safely with transforms used by positioned UI. */
+#root :where(button, .button):not(:disabled):not([aria-disabled="true"]):not(.mobile-drawer-overlay):not(.mobile-drawer-row) {
+  scale: 1;
+  transform-origin: center;
+  transition:
+    scale var(--storefront-control-duration) var(--storefront-control-easing),
+    background-color var(--storefront-control-duration) ease-out,
+    border-color var(--storefront-control-duration) ease-out,
+    box-shadow var(--storefront-control-duration) ease-out,
+    color var(--storefront-control-duration) ease-out,
+    filter var(--storefront-control-duration) ease-out,
+    opacity var(--storefront-control-duration) ease-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #root :where(button, .button):not(:disabled):not([aria-disabled="true"]):not(.mobile-drawer-overlay):not(.mobile-drawer-row):hover {
+    scale: var(--storefront-control-hover-scale);
+  }
+}
+
+#root :where(button, .button):not(:disabled):not([aria-disabled="true"]):not(.mobile-drawer-overlay):not(.mobile-drawer-row):active {
+  scale: var(--storefront-control-press-scale);
+}
+
+#root :where(button, .button):disabled,
+#root :where(button, .button)[aria-disabled="true"] {
+  scale: 1;
+}
+
+@media (max-width: 767px) {
+  @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    #root .product-card {
+      -webkit-backdrop-filter: blur(10px) saturate(105%);
+      backdrop-filter: blur(10px) saturate(105%);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #root .search-input-shell,
+  #root .shop-search-wrapper,
+  #root :where(button, .button) {
+    scale: 1 !important;
+    transform: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
